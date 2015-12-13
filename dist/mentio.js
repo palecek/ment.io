@@ -27,8 +27,6 @@ angular.module('mentio', [])
                         triggerText = triggerText.trim();
                     }
 
-                    remoteScope.showMenu();
-
                     remoteScope.search({
                         term: triggerText
                     });
@@ -524,12 +522,6 @@ angular.module('mentio', [])
                     return $scope.visible;
                 };
 
-                $scope.showMenu = function () {
-                    if (!$scope.visible) {
-                        $scope.requestVisiblePendingSearch = true;
-                    }
-                };
-
                 $scope.setParent = function (scope) {
                     $scope.parentMentio = scope;
                     $scope.targetElement = scope.targetElement;
@@ -575,9 +567,8 @@ angular.module('mentio', [])
                 scope.$watch('items', function (items) {
                     if (items && items.length > 0) {
                         scope.activate(items[0]);
-                        if (!scope.visible && scope.requestVisiblePendingSearch) {
+                        if (!scope.visible) {
                             scope.visible = true;
-                            scope.requestVisiblePendingSearch = false;
                         }
                     } else {
                         scope.hideMenu();
@@ -606,7 +597,7 @@ angular.module('mentio', [])
                 scope.adjustScroll = function (direction) {
                     var menuEl = element[0];
                     var menuItemsList = menuEl.querySelector('ul');
-                    var menuItem = (menuEl.querySelector('[mentio-menu-item].active') || 
+                    var menuItem = (menuEl.querySelector('[mentio-menu-item].active') ||
                         menuEl.querySelector('[data-mentio-menu-item].active'));
 
                     if (scope.isFirstItemActive()) {
