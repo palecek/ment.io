@@ -16,7 +16,8 @@ angular.module('mentio', [])
                 requireLeadingSpace: '=mentioRequireLeadingSpace',
                 selectNotFound: '=mentioSelectNotFound',
                 trimTerm: '=mentioTrimTerm',
-                ngModel: '='
+                ngModel: '=',
+                menuPosition: '=mentioMenuPosition'
             },
             controller: ["$scope", "$timeout", "$attrs", function($scope, $timeout, $attrs) {
 
@@ -262,6 +263,9 @@ angular.module('mentio', [])
                     if (attrs.mentioTemplateUrl) {
                         html = html + ' mentio-template-url="' + attrs.mentioTemplateUrl + '"';
                     }
+                    if (scope.menuPosition) {
+                        html = html + ' mentio-menu-position="\'' + scope.menuPosition + '\'"';
+                    }
                     html = html + ' mentio-trigger-char="\'' + scope.defaultTriggerChar + '\'"' +
                         ' mentio-parent-scope="parentScope"' +
                         '/>';
@@ -461,7 +465,8 @@ angular.module('mentio', [])
                 items: '=mentioItems',
                 triggerChar: '=mentioTriggerChar',
                 forElem: '=mentioFor',
-                parentScope: '=mentioParentScope'
+                parentScope: '=mentioParentScope',
+                menuPosition: '=mentioMenuPosition'
             },
             templateUrl: function(tElement, tAttrs) {
                 return tAttrs.mentioTemplateUrl !== undefined ? tAttrs.mentioTemplateUrl : 'mentio-menu.tpl.html';
@@ -522,6 +527,10 @@ angular.module('mentio', [])
                     return $scope.visible;
                 };
 
+                $scope.displayAbove = function () {
+                    return $scope.menuPosition === 'top';
+                };
+
                 $scope.setParent = function (scope) {
                     $scope.parentMentio = scope;
                     $scope.targetElement = scope.targetElement;
@@ -559,7 +568,7 @@ angular.module('mentio', [])
                             var triggerCharSet = [];
                             triggerCharSet.push(scope.triggerChar);
                             mentioUtil.popUnderMention(scope.parentMentio.context(),
-                                triggerCharSet, element, scope.requireLeadingSpace);
+                                triggerCharSet, element, scope.requireLeadingSpace, scope.displayAbove());
                         }
                     }
                 );
@@ -581,7 +590,7 @@ angular.module('mentio', [])
                         var triggerCharSet = [];
                         triggerCharSet.push(scope.triggerChar);
                         mentioUtil.popUnderMention(scope.parentMentio.context(),
-                            triggerCharSet, element, scope.requireLeadingSpace);
+                            triggerCharSet, element, scope.requireLeadingSpace, scope.displayAbove());
                     }
                 });
 
@@ -676,8 +685,34 @@ angular.module('mentio', [])
 angular.module('mentio')
     .factory('mentioUtil', ["$window", "$location", "$anchorScroll", "$timeout", function ($window, $location, $anchorScroll, $timeout) {
 
+        function getStyle(el, styleProp) {
+            var camelize = function (str) {
+                return str.replace(/\-(\w)/g, function (str, letter) {
+                    return letter.toUpperCase();
+                });
+            };
+
+            if (el.currentStyle) {
+                return el.currentStyle[camelize(styleProp)];
+            } else if (document.defaultView && document.defaultView.getComputedStyle) {
+                return document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
+            } else {
+                return el.style[camelize(styleProp)];
+            }
+        }
+
+        function pushAboveText(ctx, selectionEl) {
+            var menuHeight = selectionEl.height();
+            var textFontSize = parseInt(getStyle(getDocument(ctx).activeElement, 'font-size').replace('px', ''));
+            var menuMarginTop = (menuHeight + textFontSize) * -1;
+
+            selectionEl.css({
+                marginTop: menuMarginTop + 'px'
+            });
+        }
+
         // public
-        function popUnderMention (ctx, triggerCharSet, selectionEl, requireLeadingSpace) {
+        function popUnderMention (ctx, triggerCharSet, selectionEl, requireLeadingSpace, above) {
             var coordinates;
             var mentionInfo = getTriggerInfo(ctx, triggerCharSet, requireLeadingSpace, false);
 
@@ -701,6 +736,9 @@ angular.module('mentio')
 
                 $timeout(function(){
                     scrollIntoView(ctx, selectionEl);
+                    if (above) {
+                        pushAboveText(ctx, selectionEl);
+                    }
                 },0);
             } else {
                 selectionEl.css({
@@ -847,7 +885,7 @@ angular.module('mentio')
         }
 
         // public
-        function replaceTriggerText (ctx, targetElement, path, offset, triggerCharSet, 
+        function replaceTriggerText (ctx, targetElement, path, offset, triggerCharSet,
                 text, requireLeadingSpace, hasTrailingSpace) {
             resetSelection(ctx, targetElement, path, offset);
 
@@ -970,7 +1008,7 @@ angular.module('mentio')
         // public
         function getTriggerInfo (ctx, triggerCharSet, requireLeadingSpace, menuAlreadyActive, hasTrailingSpace) {
             /*jshint maxcomplexity:11 */
-            // yes this function needs refactoring 
+            // yes this function needs refactoring
             var selected, path, offset;
             if (selectedElementIsTextAreaOrInput(ctx)) {
                 selected = getDocument(ctx).activeElement;
@@ -1115,7 +1153,7 @@ angular.module('mentio')
                     obj = iframe;
                     iframe = null;
                 }
-            }            
+            }
             obj = element;
             iframe = ctx ? ctx.iframe : null;
             while(obj !== getDocument().body) {
@@ -1130,7 +1168,7 @@ angular.module('mentio')
                     obj = iframe;
                     iframe = null;
                 }
-            }            
+            }
          }
 
         function getTextAreaOrInputUnderlinePosition (ctx, element, position) {
