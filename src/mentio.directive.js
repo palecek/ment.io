@@ -16,7 +16,8 @@ angular.module('mentio', [])
                 requireLeadingSpace: '=mentioRequireLeadingSpace',
                 selectNotFound: '=mentioSelectNotFound',
                 trimTerm: '=mentioTrimTerm',
-                ngModel: '='
+                ngModel: '=',
+                menuPosition: '=mentioMenuPosition'
             },
             controller: function($scope, $timeout, $attrs) {
 
@@ -262,6 +263,9 @@ angular.module('mentio', [])
                     if (attrs.mentioTemplateUrl) {
                         html = html + ' mentio-template-url="' + attrs.mentioTemplateUrl + '"';
                     }
+                    if (scope.menuPosition) {
+                        html = html + ' mentio-menu-position="\'' + scope.menuPosition + '\'"';
+                    }
                     html = html + ' mentio-trigger-char="\'' + scope.defaultTriggerChar + '\'"' +
                         ' mentio-parent-scope="parentScope"' +
                         '/>';
@@ -461,7 +465,8 @@ angular.module('mentio', [])
                 items: '=mentioItems',
                 triggerChar: '=mentioTriggerChar',
                 forElem: '=mentioFor',
-                parentScope: '=mentioParentScope'
+                parentScope: '=mentioParentScope',
+                menuPosition: '=mentioMenuPosition'
             },
             templateUrl: function(tElement, tAttrs) {
                 return tAttrs.mentioTemplateUrl !== undefined ? tAttrs.mentioTemplateUrl : 'mentio-menu.tpl.html';
@@ -522,6 +527,10 @@ angular.module('mentio', [])
                     return $scope.visible;
                 };
 
+                $scope.displayAbove = function () {
+                    return $scope.menuPosition === 'top';
+                };
+
                 $scope.setParent = function (scope) {
                     $scope.parentMentio = scope;
                     $scope.targetElement = scope.targetElement;
@@ -559,7 +568,7 @@ angular.module('mentio', [])
                             var triggerCharSet = [];
                             triggerCharSet.push(scope.triggerChar);
                             mentioUtil.popUnderMention(scope.parentMentio.context(),
-                                triggerCharSet, element, scope.requireLeadingSpace);
+                                triggerCharSet, element, scope.requireLeadingSpace, scope.displayAbove());
                         }
                     }
                 );
@@ -581,7 +590,7 @@ angular.module('mentio', [])
                         var triggerCharSet = [];
                         triggerCharSet.push(scope.triggerChar);
                         mentioUtil.popUnderMention(scope.parentMentio.context(),
-                            triggerCharSet, element, scope.requireLeadingSpace);
+                            triggerCharSet, element, scope.requireLeadingSpace, scope.displayAbove());
                     }
                 });
 

@@ -3,8 +3,34 @@
 angular.module('mentio')
     .factory('mentioUtil', function ($window, $location, $anchorScroll, $timeout) {
 
+        function getStyle(el, styleProp) {
+            var camelize = function (str) {
+                return str.replace(/\-(\w)/g, function (str, letter) {
+                    return letter.toUpperCase();
+                });
+            };
+
+            if (el.currentStyle) {
+                return el.currentStyle[camelize(styleProp)];
+            } else if (document.defaultView && document.defaultView.getComputedStyle) {
+                return document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
+            } else {
+                return el.style[camelize(styleProp)];
+            }
+        }
+
+        function pushAboveText(ctx, selectionEl) {
+            var menuHeight = selectionEl.height();
+            var textFontSize = parseInt(getStyle(getDocument(ctx).activeElement, 'font-size').replace('px', ''));
+            var menuMarginTop = (menuHeight + textFontSize) * -1;
+
+            selectionEl.css({
+                marginTop: menuMarginTop + 'px'
+            });
+        }
+
         // public
-        function popUnderMention (ctx, triggerCharSet, selectionEl, requireLeadingSpace) {
+        function popUnderMention (ctx, triggerCharSet, selectionEl, requireLeadingSpace, above) {
             var coordinates;
             var mentionInfo = getTriggerInfo(ctx, triggerCharSet, requireLeadingSpace, false);
 
@@ -28,6 +54,9 @@ angular.module('mentio')
 
                 $timeout(function(){
                     scrollIntoView(ctx, selectionEl);
+                    if (above) {
+                        pushAboveText(ctx, selectionEl);
+                    }
                 },0);
             } else {
                 selectionEl.css({
@@ -174,7 +203,7 @@ angular.module('mentio')
         }
 
         // public
-        function replaceTriggerText (ctx, targetElement, path, offset, triggerCharSet, 
+        function replaceTriggerText (ctx, targetElement, path, offset, triggerCharSet,
                 text, requireLeadingSpace, hasTrailingSpace) {
             resetSelection(ctx, targetElement, path, offset);
 
@@ -297,7 +326,7 @@ angular.module('mentio')
         // public
         function getTriggerInfo (ctx, triggerCharSet, requireLeadingSpace, menuAlreadyActive, hasTrailingSpace) {
             /*jshint maxcomplexity:11 */
-            // yes this function needs refactoring 
+            // yes this function needs refactoring
             var selected, path, offset;
             if (selectedElementIsTextAreaOrInput(ctx)) {
                 selected = getDocument(ctx).activeElement;
@@ -442,7 +471,7 @@ angular.module('mentio')
                     obj = iframe;
                     iframe = null;
                 }
-            }            
+            }
             obj = element;
             iframe = ctx ? ctx.iframe : null;
             while(obj !== getDocument().body) {
@@ -457,7 +486,7 @@ angular.module('mentio')
                     obj = iframe;
                     iframe = null;
                 }
-            }            
+            }
          }
 
         function getTextAreaOrInputUnderlinePosition (ctx, element, position) {
