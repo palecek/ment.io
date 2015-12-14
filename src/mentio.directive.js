@@ -579,6 +579,11 @@ angular.module('mentio', [])
                         if (!scope.visible) {
                             scope.visible = true;
                         }
+
+                        var triggerCharSet = [];
+                        triggerCharSet.push(scope.triggerChar);
+                        mentioUtil.popUnderMention(scope.parentMentio.context(),
+                            triggerCharSet, element, scope.requireLeadingSpace, scope.displayAbove());
                     } else {
                         scope.hideMenu();
                     }
