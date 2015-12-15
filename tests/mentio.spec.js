@@ -3,7 +3,7 @@
 describe('mentio-menu', function () {
     var searchSpy, $scope, mentioScope, $compile, $document, mentioUtilService, $window, $timeout;
 
-    beforeEach(module('mentio', function($provide) {
+    beforeEach(module('mentio', function ($provide) {
         $provide.value('$log', console);
     }));
 
@@ -15,13 +15,13 @@ describe('mentio-menu', function () {
         mentioUtilService = mentioUtil;
 
         $templateCache.put('/people-mentions.tpl',
-                '<div>' +
-                '<li mentio-menu-item="person" ng-repeat="person in items">' +
-                '   <img ng-src="{{person.imageUrl}}"><p class="name">{{person.name}}</p>' +
-                '   <p>{{person.bio.substring(0,30)}}</p>' +
-                '</li>' +
-                '</ul>' +
-                '</div>');
+            '<div>' +
+            '<li mentio-menu-item="person" ng-repeat="person in items">' +
+            '   <img ng-src="{{person.imageUrl}}"><p class="name">{{person.name}}</p>' +
+            '   <p>{{person.bio.substring(0,30)}}</p>' +
+            '</li>' +
+            '</ul>' +
+            '</div>');
 
         $scope = $rootScope.$new();
 
@@ -34,7 +34,7 @@ describe('mentio-menu', function () {
 
     function compareItems(items, mentioMenuScope) {
         var childCount = 0;
-        for(var cs = mentioMenuScope.$$childHead; cs; cs = cs.$$nextSibling) {
+        for (var cs = mentioMenuScope.$$childHead; cs; cs = cs.$$nextSibling) {
             expect(cs.item).toEqual(items[childCount])
             childCount++;
         }
@@ -64,9 +64,9 @@ describe('mentio-menu', function () {
             {label: 'test2'}
         ];
 
-        scope.search = function(term) {
+        scope.search = function (term) {
             var results = [];
-            angular.forEach(scope.mockItemsSource, function(item) {
+            angular.forEach(scope.mockItemsSource, function (item) {
                 if (item.label.toUpperCase().indexOf(term.toUpperCase()) >= 0) {
                     results.push(item);
                 }
@@ -82,8 +82,8 @@ describe('mentio-menu', function () {
         scope.$apply();
 
         // This is ugly, uses undocumented method to access the child scopes
-        for(var cs = scope.$$childHead; cs; cs = cs.$$nextSibling) {
-            if(cs.triggerCharMap) {
+        for (var cs = scope.$$childHead; cs; cs = cs.$$nextSibling) {
+            if (cs.triggerCharMap) {
                 mentioScope = cs;
             }
         }
@@ -101,13 +101,13 @@ describe('mentio-menu', function () {
             {label: 'test1'},
             {label: 'test2'},
             {label: 'test3'}
-         ];
+        ];
 
         $scope.$apply();
 
         // This is ugly, uses undocumented method to access the child scopes
-        for(var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
-            if(cs.triggerCharMap) {
+        for (var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
+            if (cs.triggerCharMap) {
                 mentioScope = cs;
             }
         }
@@ -120,7 +120,7 @@ describe('mentio-menu', function () {
         mentioScope.query('@', 'test');
         mentioScope.$apply();
 
-        expect(searchSpy).toHaveBeenCalledWith({ term : 'test' });
+        expect(searchSpy).toHaveBeenCalledWith({term: 'test'});
         expect(mentioScope.isActive()).toBeTruthy();
         expect(mentioScope.triggerCharMap['@'].isVisible()).toBeTruthy();
         expect(mentioScope.getActiveMenuScope()).toEqual(mentioScope.triggerCharMap['@']);
@@ -138,7 +138,7 @@ describe('mentio-menu', function () {
         mentioScope.query('@', 'test');
         mentioScope.$apply();
 
-        expect(searchSpy).toHaveBeenCalledWith({ term : 'test' });
+        expect(searchSpy).toHaveBeenCalledWith({term: 'test'});
         expect(mentioScope.isActive()).toBeTruthy();
         expect(mentioScope.triggerCharMap['@'].isVisible()).toBeTruthy();
 
@@ -155,14 +155,14 @@ describe('mentio-menu', function () {
         mentioScope.query('@', 'test1');
         mentioScope.$apply();
 
-        expect(searchSpy).toHaveBeenCalledWith({ term : 'test1' });
+        expect(searchSpy).toHaveBeenCalledWith({term: 'test1'});
         expect(mentioScope.isActive()).toBeTruthy();
         expect(mentioScope.triggerCharMap['@'].isVisible()).toBeTruthy();
 
         compareItems($scope.mockItems, mentioScope.triggerCharMap['@']);
     });
 
-    it('should trim search term by default', function() {
+    it('should trim search term by default', function () {
         createMentio($scope);
 
         createMentioMenu($scope);
@@ -170,10 +170,10 @@ describe('mentio-menu', function () {
         mentioScope.query('@', 'test1 ');
         mentioScope.$apply();
 
-        expect(searchSpy).toHaveBeenCalledWith({ term : 'test1' });
+        expect(searchSpy).toHaveBeenCalledWith({term: 'test1'});
     });
 
-    it('should not trim search term if disabled in the attributes', function() {
+    it('should not trim search term if disabled in the attributes', function () {
         createMentio($scope, {
             "mentio-trim-term": "false"
         });
@@ -183,10 +183,10 @@ describe('mentio-menu', function () {
         mentioScope.query('@', 'test1 ');
         mentioScope.$apply();
 
-        expect(searchSpy).toHaveBeenCalledWith({ term : 'test1 ' });
+        expect(searchSpy).toHaveBeenCalledWith({term: 'test1 '});
     });
 
-    it('should have a working isFirstItemActive method', function() {
+    it('should have a working isFirstItemActive method', function () {
         createMentio($scope);
         createMentioMenu($scope);
 
@@ -200,7 +200,7 @@ describe('mentio-menu', function () {
         expect(menu.isFirstItemActive()).toBe(false);
     });
 
-    it('should have a working isLastItemActive method', function() {
+    it('should have a working isLastItemActive method', function () {
         createMentio($scope);
         createMentioMenu($scope);
 
@@ -214,7 +214,7 @@ describe('mentio-menu', function () {
         expect(menu.isLastItemActive()).toBe(true);
     });
 
-    it('should have a working adjustScroll method', function() {
+    it('should have a working adjustScroll method', function () {
         var menuItemsListEl = {
             scrollTop: 0,
             scrollHeight: 90
@@ -232,11 +232,11 @@ describe('mentio-menu', function () {
 
         var menuScope = mentioScope.getActiveMenuScope();
 
-        menuScope.items = [{ label: 'test1' }, { label: 'test2' }, { label: 'test3' }];
+        menuScope.items = [{label: 'test1'}, {label: 'test2'}, {label: 'test3'}];
         menuScope.$apply();
 
         var menuEl = document.querySelector('mentio-menu');
-        var querySpy = spyOn(menuEl, 'querySelector').andCallFake(function(sel) {
+        var querySpy = spyOn(menuEl, 'querySelector').andCallFake(function (sel) {
             if (sel === 'ul') return menuItemsListEl;
 
             return menuItemEl;
@@ -352,20 +352,20 @@ describe('mentio-menu', function () {
         $compile(elem)($scope);
         $document[0].body.appendChild(elem[0]);
 
-        mentioUtilService.selectElement(null, elem[0], [0,0], 1);
+        mentioUtilService.selectElement(null, elem[0], [0, 0], 1);
 
         var selectionInfo = mentioUtilService.getContentEditableSelectedPath();
 
         expect(selectionInfo.selected).toEqual(elem[0]);
-        expect(selectionInfo.path).toEqual([0,0]);
+        expect(selectionInfo.path).toEqual([0, 0]);
         expect(selectionInfo.offset).toEqual(1);
 
-        mentioUtilService.selectElement(null, elem[0], [0,2], 1);
+        mentioUtilService.selectElement(null, elem[0], [0, 2], 1);
 
         var selectionInfo = mentioUtilService.getContentEditableSelectedPath();
 
         expect(selectionInfo.selected).toEqual(elem[0]);
-        expect(selectionInfo.path).toEqual([0,2]);
+        expect(selectionInfo.path).toEqual([0, 2]);
         expect(selectionInfo.offset).toEqual(1);
 
         $scope.$apply();
@@ -414,15 +414,15 @@ describe('mentio-menu', function () {
             {label: 'test1'},
             {label: 'test2'},
             {label: 'test3'}
-         ];
+        ];
 
         $scope.$apply();
 
         mentioUtilService.selectElement(null, elem[0], [0], 5);
 
         // This is ugly, uses undocumented method to access the child scopes
-        for(var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
-            if(cs.triggerCharMap) {
+        for (var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
+            if (cs.triggerCharMap) {
                 mentioScope = cs;
             }
         }
@@ -446,8 +446,8 @@ describe('mentio-menu', function () {
         $scope.$apply();
 
         // This is ugly, uses undocumented method to access the child scopes
-        for(var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
-            if(cs.triggerCharMap) {
+        for (var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
+            if (cs.triggerCharMap) {
                 mentioScope = cs;
             }
         }
@@ -474,7 +474,7 @@ describe('mentio-menu', function () {
             {label: 'test1'},
             {label: 'test2'},
             {label: 'test3'}
-         ];
+        ];
 
         $scope.$apply();
 
@@ -505,7 +505,7 @@ describe('mentio-menu', function () {
             {label: 'test1'},
             {label: 'test2'},
             {label: 'test3'}
-         ];
+        ];
 
         $scope.$apply();
 
@@ -534,12 +534,12 @@ describe('mentio-menu', function () {
             {label: 'test1'},
             {label: 'test2'},
             {label: 'test3'}
-         ];
+        ];
 
         var macros = {
             brb: 'Be right back',
             omw: 'On my way'
-         };
+        };
 
         $scope.$apply();
 
@@ -597,20 +597,20 @@ describe('mentio-menu', function () {
             {label: 'test1'},
             {label: 'test2'},
             {label: 'test3'}
-         ];
+        ];
 
         $scope.macros = {
             brb: 'Be right back',
             omw: 'On my way'
-         };
+        };
 
         $scope.$apply();
 
         mentioUtilService.selectElement(null, elem[0], [0], 5);
 
         // This is ugly, uses undocumented method to access the child scopes
-        for(var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
-            if(cs.triggerCharMap) {
+        for (var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
+            if (cs.triggerCharMap) {
                 mentioScope = cs;
             }
         }
