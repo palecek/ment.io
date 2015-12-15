@@ -143,7 +143,6 @@ angular.module('mentio')
             range = getDocument(ctx).createRange();
             range.setStart(sel.anchorNode, startPos);
             range.setEnd(sel.anchorNode, endPos);
-            range.deleteContents();
 
             var el = getDocument(ctx).createElement('div');
             el.innerHTML = html;
@@ -158,6 +157,7 @@ angular.module('mentio')
             if (lastNode) {
                 range = range.cloneRange();
                 range.setStartAfter(lastNode);
+                range.deleteContents();
                 range.collapse(true);
                 sel.removeAllRanges();
                 sel.addRange(range);
