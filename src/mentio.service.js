@@ -20,7 +20,7 @@ angular.module('mentio')
         }
 
         function pushAboveText(ctx, selectionEl) {
-            var menuHeight = selectionEl.height();
+            var menuHeight = selectionEl[0].offsetHeight;
             var textFontSize = parseInt(getStyle(getDocument(ctx).activeElement, 'font-size').replace('px', ''));
             var menuMarginTop = (menuHeight + textFontSize) * -1;
 
