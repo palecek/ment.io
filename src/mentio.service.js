@@ -58,10 +58,6 @@ angular.module('mentio')
                         pushAboveText(ctx, selectionEl);
                     }
                 }, 0);
-            } else {
-                selectionEl.css({
-                    display: 'none'
-                });
             }
         }
 
